@@ -25,6 +25,12 @@ export class Main {
 
     this.#renderer = new Renderer(this.#scene, this.#container);
     this.#camera = new Camera(this.#renderer.threeRenderer);
+
+    this.#container.appendChild(this.#renderer.threeRenderer.domElement);
+    this.#loadAssets();
+  }
+
+  #onAssetLoadingComplete() {
     this.#plane = new Plane();
     this.#cube = new Cube();
     this.#light = new Light();
@@ -35,11 +41,6 @@ export class Main {
 
     this.#camera.camera.lookAt(this.#scene.position);
 
-    this.#container.appendChild(this.#renderer.threeRenderer.domElement);
-    this.#loadAssets();
-  }
-
-  #onAssetLoadingComplete() {
     this.#render();
     this.#setEvents();
   }
@@ -62,7 +63,8 @@ export class Main {
     const keys = Object.keys(images);
     keys.forEach((image, i) => {
       this.#textureLoader.load(images[image], (texture) => {
-        IMAGES[image] = texture;
+        const imageName = image.split(".")[0];
+        IMAGES[imageName] = texture;
 
         if (i === keys.length - 1) {
           this.#onAssetLoadingComplete();
@@ -81,7 +83,8 @@ export class Main {
 
     keys.forEach((sound, i) => {
       this.#audioLoader.load(sounds[sound], (buffer) => {
-        SOUNDS[sound] = buffer;
+        const soundName = sound.split(".")[0];
+        SOUNDS[soundName] = buffer;
 
         if (i === keys.length - 1) {
           this.#loadTextures();
@@ -98,7 +101,8 @@ export class Main {
 
     keys.forEach((model, i) => {
       this.#gltfLoader.load(models[model], (gltf) => {
-        MODELS[model] = gltf;
+        const modelName = model.split(".")[0];
+        MODELS[modelName] = gltf;
 
         if (i === keys.length - 1) {
           this.#loadSounds();
