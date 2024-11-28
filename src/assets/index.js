@@ -8,3 +8,7 @@ export default {
   sounds,
 };
 
+export const MODELS = {};
+export const IMAGES = {};
+export const SOUNDS = {};
+
