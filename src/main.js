@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import assets, { IMAGES, MODELS, SOUNDS } from "./assets";
 import Camera from "./components/Camera";
 import Cube from "./components/Cube";
@@ -35,12 +35,15 @@ export class Main {
     this.#cube = new Cube();
     this.#light = new Light();
 
-    this.#scene.add(this.#plane.plane);
+    this.#scene.add(this.#plane);
     this.#scene.add(this.#cube.cube);
     this.#light.addLights(this.#scene);
 
     this.#camera.camera.lookAt(this.#scene.position);
 
+    const canvas = document.getElementById("container");
+    const controls = new OrbitControls(this.#camera.camera, canvas);
+    controls.enableDamping = true;
     this.#render();
     this.#setEvents();
   }
