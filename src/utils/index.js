@@ -17,3 +17,12 @@ export const callIfExists = (cb) => {
     cb();
   }
 };
+
+export const setTransforms = (el, transform) => {
+  const { position = { x: 0, y: 0, z: 0 }, rotation = { x: 0, y: 0, z: 0 }, scale = { x: 1, y: 1, z: 1 } } = transform;
+
+  el.position.set(position.x ?? 0, position.y ?? 0, position.z ?? 0);
+  el.rotation.set(rotation.x ?? 0, rotation.y ?? 0, rotation.z ?? 0);
+  el.scale.set(scale.x ?? 1, scale.y ?? 1, scale.z ?? 1);
+};
+

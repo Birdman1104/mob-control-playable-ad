@@ -3,8 +3,8 @@ export const CameraConfig = {
   near: 2,
   far: 1000,
   aspect: 1,
-  posX: 9,
-  posY: 7,
+  posX: 18,
+  posY: 15,
   posZ: 0,
 };
 

@@ -1,12 +1,15 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import Plane from "./components/Plane";
-import Renderer from "./components/Renderer";
+import Cannon from "./components/Cannon";
+import Ground from "./components/Ground";
+import Ocean from "./components/Ocean";
 import Tower from "./components/Tower";
+import { CannonConfig, TowerConfig } from "./configs/ComponentsConfig";
 import Camera from "./essentials/Camera";
 import Light from "./essentials/Light";
 import Loader from "./essentials/Loader";
-import { fitDimension } from "./utils";
+import Renderer from "./essentials/Renderer";
+import { fitDimension, setTransforms } from "./utils";
 
 export class Main {
   #loader; // Loader
@@ -16,9 +19,10 @@ export class Main {
   #renderer; // Renderer
   #camera; // Camera
   #plane; // Plane
-  #ground; // Ground
+  #ocean; // Ocean
   #light; // Light
   #tower; // Tower
+  #cannon; // Cannon
 
   #canvas; // HTMLCanvasElement
 
@@ -51,12 +55,13 @@ export class Main {
   #initComponents() {
     this.#initPlane();
     this.#initLight();
-    // this.#initGround();
+    // this.#initOcean();
     this.#initTower();
+    this.#initCannon();
   }
 
   #initPlane() {
-    this.#plane = new Plane();
+    this.#plane = new Ground();
     this.#scene.add(this.#plane);
   }
 
@@ -65,15 +70,22 @@ export class Main {
     this.#light.addLights(this.#scene);
   }
 
-  #initGround() {
-    this.#ground = new Ground();
-    this.#ground.position.y = -1.5;
-    this.#scene.add(this.#ground);
+  #initOcean() {
+    this.#ocean = new Ocean();
+    this.#ocean.position.y = -1.5;
+    this.#scene.add(this.#ocean);
   }
 
   #initTower() {
     this.#tower = new Tower();
+    setTransforms(this.#tower, TowerConfig);
     this.#scene.add(this.#tower);
+  }
+
+  #initCannon() {
+    this.#cannon = new Cannon();
+    setTransforms(this.#cannon, CannonConfig);
+    this.#scene.add(this.#cannon);
   }
 
   #render() {
