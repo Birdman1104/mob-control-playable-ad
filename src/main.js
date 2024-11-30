@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import Ground from "./components/Ground";
 import Plane from "./components/Plane";
 import Renderer from "./components/Renderer";
+import Tower from "./components/Tower";
 import Camera from "./essentials/Camera";
 import Light from "./essentials/Light";
 import Loader from "./essentials/Loader";
@@ -18,6 +18,7 @@ export class Main {
   #plane; // Plane
   #ground; // Ground
   #light; // Light
+  #tower; // Tower
 
   #canvas; // HTMLCanvasElement
 
@@ -34,23 +35,45 @@ export class Main {
   }
 
   #onAssetLoadingComplete() {
-    this.#plane = new Plane();
-    this.#light = new Light();
-    this.#ground = new Ground();
-
-    this.#ground.position.y = -1.5;
-
-    this.#scene.add(this.#ground);
-    this.#scene.add(this.#plane);
-    this.#light.addLights(this.#scene);
+    this.#initComponents();
 
     this.#camera.camera.lookAt(this.#scene.position);
 
     this.#canvas = document.getElementById("container");
-    const controls = new OrbitControls(this.#camera.camera, this.#canvas);
-    controls.enableDamping = true;
+    if (process.env.NODE_ENV !== "production") {
+      this.#initOrbitControls();
+    }
+
     this.#render();
     this.#setEvents();
+  }
+
+  #initComponents() {
+    this.#initPlane();
+    this.#initLight();
+    // this.#initGround();
+    this.#initTower();
+  }
+
+  #initPlane() {
+    this.#plane = new Plane();
+    this.#scene.add(this.#plane);
+  }
+
+  #initLight() {
+    this.#light = new Light();
+    this.#light.addLights(this.#scene);
+  }
+
+  #initGround() {
+    this.#ground = new Ground();
+    this.#ground.position.y = -1.5;
+    this.#scene.add(this.#ground);
+  }
+
+  #initTower() {
+    this.#tower = new Tower();
+    this.#scene.add(this.#tower);
   }
 
   #render() {
@@ -59,13 +82,14 @@ export class Main {
   }
 
   #setEvents() {
-    window.addEventListener("resize", () => {
-      const { width: w, height: h } = fitDimension();
-      this.#resizeCanvas(w, h);
+    window.addEventListener("resize", () => this.#onResize());
+  }
 
-      this.#camera.resize(this.#renderer.threeRenderer, h);
-      this.#renderer.resize(this.#scene, this.#camera.camera);
-    });
+  #onResize() {
+    const { width: w, height: h } = fitDimension();
+    this.#resizeCanvas(w, h);
+    this.#camera.resize(this.#renderer.threeRenderer, h);
+    this.#renderer.resize(this.#scene, this.#camera.camera);
   }
 
   #resizeCanvas(width, height) {
@@ -73,6 +97,11 @@ export class Main {
     const { style } = this.#canvas;
     style.width = `${width}px`;
     style.height = `${height}px`;
+  }
+
+  #initOrbitControls() {
+    const controls = new OrbitControls(this.#camera.camera, this.#canvas);
+    controls.enableDamping = true;
   }
 }
 
