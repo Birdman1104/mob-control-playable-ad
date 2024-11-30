@@ -7,6 +7,7 @@ import Ground from "./components/Ground";
 import Light from "./components/Light";
 import Plane from "./components/Plane";
 import Renderer from "./components/Renderer";
+import { fitDimension } from "./utils";
 
 export class Main {
   #gltfLoader; // GLTFLoader
@@ -22,11 +23,13 @@ export class Main {
   #cube; // Cube
   #light; // Light
 
+  #canvas; // HTMLCanvasElement
+
   constructor(container) {
     this.#scene = new THREE.Scene();
     this.#container = container;
 
-    this.#renderer = new Renderer(this.#scene, this.#container);
+    this.#renderer = new Renderer(this.#container);
     this.#camera = new Camera(this.#renderer.threeRenderer);
 
     this.#container.appendChild(this.#renderer.threeRenderer.domElement);
@@ -37,7 +40,7 @@ export class Main {
     this.#plane = new Plane();
     this.#cube = new Cube();
     this.#light = new Light();
-    this.#ground = new Ground(this.#scene);
+    this.#ground = new Ground();
 
     this.#ground.position.y = -1.5;
 
@@ -48,8 +51,8 @@ export class Main {
 
     this.#camera.camera.lookAt(this.#scene.position);
 
-    const canvas = document.getElementById("container");
-    const controls = new OrbitControls(this.#camera.camera, canvas);
+    this.#canvas = document.getElementById("container");
+    const controls = new OrbitControls(this.#camera.camera, this.#canvas);
     controls.enableDamping = true;
     this.#render();
     this.#setEvents();
@@ -88,7 +91,6 @@ export class Main {
     const keys = Object.keys(sounds);
     const listener = new THREE.AudioListener();
     this.#camera.camera.add(listener);
-    // const soundSource = new THREE.Audio(listener);
     this.#audioLoader = new THREE.AudioLoader();
 
     keys.forEach((sound, i) => {
@@ -123,17 +125,23 @@ export class Main {
 
   #setEvents() {
     window.addEventListener("resize", () => {
-      const { cameraWidth } = this.#camera.camera;
-      const newAspectRatio = this.#container.offsetWidth / this.#container.offsetHeight;
-      const adjustedCameraHeight = cameraWidth / newAspectRatio;
+      const { width: w, height: h } = fitDimension();
+      this.#resizeCanvas(w, h);
 
-      this.#camera.camera.top = adjustedCameraHeight / 2;
-      this.#camera.camera.bottom = adjustedCameraHeight / -2;
+      this.#camera.camera.top = h / 2;
+      this.#camera.camera.bottom = h / -2;
       this.#camera.camera.updateProjectionMatrix();
 
       this.#renderer.updateSize();
       this.#renderer.threeRenderer.render(this.#scene, this.#camera.camera);
     });
+  }
+
+  #resizeCanvas(width, height) {
+    if (!this.#canvas) return;
+    const { style } = this.#canvas;
+    style.width = `${width}px`;
+    style.height = `${height}px`;
   }
 }
 

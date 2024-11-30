@@ -1,11 +1,9 @@
 import * as THREE from "three";
 
 export default class Renderer {
-  #scene; // THREE.Scene
   #container; // HTMLElement
 
-  constructor(scene, container) {
-    this.#scene = scene;
+  constructor(container) {
     this.#container = container;
     this.threeRenderer = this.#initRenderer();
     this.#container.appendChild(this.threeRenderer.domElement);
