@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import assets, { IMAGES, MODELS, SOUNDS } from "./assets";
 import Camera from "./components/Camera";
-import Cube from "./components/Cube";
 import Ground from "./components/Ground";
 import Light from "./components/Light";
 import Plane from "./components/Plane";
@@ -20,7 +19,6 @@ export class Main {
   #camera; // Camera
   #plane; // Plane
   #ground; // Ground
-  #cube; // Cube
   #light; // Light
 
   #canvas; // HTMLCanvasElement
@@ -38,7 +36,6 @@ export class Main {
 
   #onAssetLoadingComplete() {
     this.#plane = new Plane();
-    this.#cube = new Cube();
     this.#light = new Light();
     this.#ground = new Ground();
 
@@ -46,7 +43,6 @@ export class Main {
 
     this.#scene.add(this.#ground);
     this.#scene.add(this.#plane);
-    this.#scene.add(this.#cube.cube);
     this.#light.addLights(this.#scene);
 
     this.#camera.camera.lookAt(this.#scene.position);
@@ -59,8 +55,6 @@ export class Main {
   }
 
   #render() {
-    this.#cube.animateCube();
-
     requestAnimationFrame(this.#render.bind(this));
     this.#renderer.render(this.#scene, this.#camera.camera);
   }
