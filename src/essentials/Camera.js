@@ -6,13 +6,19 @@ export default class Camera {
 
   constructor(renderer) {
     this.#threeCamera = this.#getCamera(renderer);
-    this.#updateSize(renderer);
-
-    window.addEventListener("resize", this.#updateSize.bind(this, renderer), false);
+    this.resize(renderer);
   }
 
   get camera() {
     return this.#threeCamera;
+  }
+
+  resize(renderer, h) {
+    this.camera.top = h / 2;
+    this.camera.bottom = h / -2;
+    const { width, height } = renderer.domElement;
+    this.#threeCamera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
   }
 
   #getCamera(renderer) {
@@ -22,12 +28,6 @@ export default class Camera {
     const camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
     camera.position.set(posX, posY, posZ);
     return camera;
-  }
-
-  #updateSize(renderer) {
-    const { width, height } = renderer.domElement;
-    this.#threeCamera.aspect = width / height;
-    this.#threeCamera.updateProjectionMatrix();
   }
 }
 

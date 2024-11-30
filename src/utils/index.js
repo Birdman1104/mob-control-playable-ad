@@ -12,3 +12,8 @@ export const fitDimension = () => {
   return { width: w, height: h };
 };
 
+export const callIfExists = (cb) => {
+  if (typeof cb === "function") {
+    cb();
+  }
+};
