@@ -58,3 +58,11 @@ export const isMobileDevice = () => {
   return false;
 };
 
+export const getCanvasBounds = () => {
+  const container = document.getElementById("container");
+  if (!container) return { width: 0, height: 0 };
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+  return { width, height };
+};
+

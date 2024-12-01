@@ -5,8 +5,6 @@ import { fitDimension } from "../utils";
 import PixiStage from "./MainStage";
 
 export default class PixiUI extends Application {
-  #stage;
-
   constructor() {
     super({
       backgroundColor: 0xffffff,
