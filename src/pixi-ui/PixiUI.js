@@ -47,11 +47,11 @@ export default class PixiUI extends Application {
   }
 
   async loadAssets() {
-    const { images } = assets;
-    const keys = Object.keys(images);
+    const { ui } = assets;
+    const keys = Object.keys(ui);
 
     for (const key of keys) {
-      Assets.add({ alias: key, src: images[key] });
+      Assets.add({ alias: key, src: ui[key] });
       await Assets.load(key);
     }
   }
