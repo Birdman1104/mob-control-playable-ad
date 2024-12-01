@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import Cannon from "./components/Cannon";
 import Ground from "./components/Ground";
+import NormalMob from "./components/NormalMob";
 import Ocean from "./components/Ocean";
 import Tower from "./components/Tower";
 import { CannonConfig, TowerConfig } from "./configs/ComponentsConfig";
@@ -25,6 +26,10 @@ export class Main {
   #cannon; // Cannon
 
   #canvas; // HTMLCanvasElement
+
+  #mobs = [];
+
+  #prevTime = 0;
 
   constructor(container) {
     this.#scene = new THREE.Scene();
@@ -86,10 +91,20 @@ export class Main {
     this.#cannon = new Cannon();
     setTransforms(this.#cannon, CannonConfig);
     this.#scene.add(this.#cannon);
+
+    const mob = new NormalMob();
+    mob.position.set(0, 0.5, 0);
+    mob.rotation.set(0, Math.PI / 2, 0);
+    this.#scene.add(mob);
+    this.#mobs.push(mob);
   }
 
-  #render() {
+  #render(dt) {
     requestAnimationFrame(this.#render.bind(this));
+    this.#cannon?.update(dt);
+
+    this.#mobs.forEach((mob) => mob.update(dt));
+    this.#prevTime = dt;
     this.#renderer.render(this.#scene, this.#camera.camera);
   }
 

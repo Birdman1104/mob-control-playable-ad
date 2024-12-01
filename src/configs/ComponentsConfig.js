@@ -13,7 +13,7 @@ export const CannonConfig = Object.freeze({
 });
 
 export const GroundConfig = Object.freeze({
-  color: 0x00ffff,
+  color: 0x9e6136,
   roadSize: { x: 4, y: 19, z: 0.5 },
   road: {
     rotation: { x: Math.PI / 2, y: 0, z: Math.PI / 2 },
