@@ -26,3 +26,30 @@ export const setTransforms = (el, transform) => {
   el.scale.set(scale.x ?? 1, scale.y ?? 1, scale.z ?? 1);
 };
 
+export const isMobileDevice = () => {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  if (/android/i.test(userAgent)) {
+    return true;
+  }
+
+  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    return true;
+  }
+
+  if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+    return true;
+  }
+
+  const isTouchCapable = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isLargeScreen = window.innerWidth > 768 || window.innerHeight > 768;
+
+  if (isTouchCapable && isLargeScreen) {
+    return true;
+  }
+
+  if (/Mobile|Opera Mini|IEMobile|WPDesktop|BlackBerry|PlayBook|BB10|webOS|Windows Phone|Kindle/.test(userAgent)) {
+    return true;
+  }
+  return false;
+};
+

@@ -10,7 +10,7 @@ import Camera from "./essentials/Camera";
 import Light from "./essentials/Light";
 import Loader from "./essentials/Loader";
 import Renderer from "./essentials/Renderer";
-import { fitDimension, setTransforms } from "./utils";
+import { fitDimension, isMobileDevice, setTransforms } from "./utils";
 
 export class Main {
   #loader; // Loader
@@ -31,7 +31,13 @@ export class Main {
 
   #prevTime = 0;
 
+  #touchStartX = 0;
+  #isTouching = false;
+
+  #isMobile;
+
   constructor(container) {
+    this.#isMobile = isMobileDevice();
     this.#scene = new THREE.Scene();
     this.#container = container;
 
@@ -46,11 +52,13 @@ export class Main {
   #onAssetLoadingComplete() {
     this.#initComponents();
 
+    this.#isMobile ? this.#addTouchControls() : this.#initPointerControls();
+
     this.#camera.camera.lookAt(this.#scene.position);
 
     this.#canvas = document.getElementById("container");
     if (process.env.NODE_ENV !== "production") {
-      this.#initOrbitControls();
+      // this.#initOrbitControls();
     }
 
     this.#render();
@@ -117,6 +125,15 @@ export class Main {
     this.#resizeCanvas(w, h);
     this.#camera.resize(this.#renderer.threeRenderer, h);
     this.#renderer.resize(this.#scene, this.#camera.camera);
+
+    this.#resetControls();
+  }
+
+  #resetControls() {
+    this.#removePointerControls();
+    this.#removeTouchControls();
+    this.#isMobile = isMobileDevice();
+    this.#isMobile ? this.#addTouchControls() : this.#initPointerControls();
   }
 
   #resizeCanvas(width, height) {
@@ -129,6 +146,69 @@ export class Main {
   #initOrbitControls() {
     const controls = new OrbitControls(this.#camera.camera, this.#canvas);
     controls.enableDamping = true;
+  }
+
+  #addTouchControls() {
+    window.addEventListener("touchstart", (e) => this.#onTouchStart(e));
+    window.addEventListener("touchmove", (e) => this.#onTouchMove(e));
+    window.addEventListener("touchup", () => this.#onTouchEnd());
+    window.addEventListener("touchcancel", (e) => this.#onTouchEnd());
+  }
+
+  #removeTouchControls() {
+    window.removeEventListener("touchstart", (e) => this.#onTouchStart(e));
+    window.removeEventListener("touchmove", (e) => this.#onTouchMove(e));
+    window.removeEventListener("touchup", () => this.#onTouchEnd());
+    window.removeEventListener("touchcancel", (e) => this.#onTouchEnd());
+  }
+
+  #initPointerControls() {
+    window.addEventListener("pointerdown", (e) => this.#onPointerDown(e));
+    window.addEventListener("pointermove", (e) => this.#onPointerMove(e));
+    window.addEventListener("pointerup", () => this.#onTouchEnd());
+  }
+
+  #removePointerControls() {
+    window.removeEventListener("pointerdown", (e) => this.#onPointerDown(e));
+    window.removeEventListener("pointermove", (e) => this.#onPointerMove(e));
+    window.removeEventListener("pointerup", () => this.#onTouchEnd());
+  }
+
+  #onTouchStart(event) {
+    this.#initTouchStart(event.targetTouches[0].clientX);
+  }
+
+  #onPointerDown(event) {
+    this.#initTouchStart(event.clientX);
+  }
+
+  #initTouchStart(clientX) {
+    this.#touchStartX = clientX;
+    this.#isTouching = true;
+  }
+
+  #onTouchMove(event) {
+    if (this.#isTouching) {
+      this.#initTouchMove(event.targetTouches[0].clientX);
+    }
+  }
+
+  #onPointerMove(event) {
+    if (this.#isTouching) {
+      this.#initTouchMove(event.clientX);
+    }
+  }
+
+  #initTouchMove(clientX) {
+    const deltaX = clientX - this.#touchStartX;
+    const movementSpeed = 0.01;
+    this.#cannon.position.z -= deltaX * movementSpeed;
+    this.#cannon.position.z = Math.max(CannonConfig.minZ, Math.min(CannonConfig.maxZ, this.#cannon.position.z));
+    this.#touchStartX = clientX;
+  }
+
+  #onTouchEnd() {
+    this.#isTouching = false;
   }
 }
 

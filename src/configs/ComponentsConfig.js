@@ -10,6 +10,8 @@ export const CannonConfig = Object.freeze({
   position: { x: 8, y: 0.25, z: 0 },
   rotation: { x: 0, y: Math.PI / 2, z: 0 },
   scale: { x: 1, y: 1, z: 1 },
+  minZ: -1.75,
+  maxZ: 1.75,
 });
 
 export const GroundConfig = Object.freeze({
