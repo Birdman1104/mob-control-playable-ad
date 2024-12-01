@@ -1,3 +1,8 @@
+export const lp = (l, p) => {
+  const { clientWidth: w, clientHeight: h } = document.body;
+  return w > h ? l : p;
+};
+
 export const fitDimension = () => {
   const aspect = 16 / 10;
   let { innerWidth: w, innerHeight: h } = window;

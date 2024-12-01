@@ -12,7 +12,7 @@ import Loader from "./essentials/Loader";
 import Renderer from "./essentials/Renderer";
 import { fitDimension, isMobileDevice, setTransforms } from "./utils";
 
-export class Main {
+export class ThreeApp {
   #loader; // Loader
 
   #scene; // THREE.Scene
@@ -49,6 +49,15 @@ export class Main {
     this.#loader.load();
   }
 
+  resize() {
+    const { width: w, height: h } = fitDimension();
+    this.#resizeCanvas(w, h);
+    this.#camera?.resize(this.#renderer.threeRenderer, h);
+    this.#renderer?.resize(this.#scene, this.#camera.camera);
+
+    this.#resetControls();
+  }
+
   #onAssetLoadingComplete() {
     this.#initComponents();
 
@@ -62,7 +71,6 @@ export class Main {
     }
 
     this.#render();
-    this.#setEvents();
   }
 
   #initComponents() {
@@ -114,19 +122,6 @@ export class Main {
     this.#mobs.forEach((mob) => mob.update(dt));
     this.#prevTime = dt;
     this.#renderer.render(this.#scene, this.#camera.camera);
-  }
-
-  #setEvents() {
-    window.addEventListener("resize", () => this.#onResize());
-  }
-
-  #onResize() {
-    const { width: w, height: h } = fitDimension();
-    this.#resizeCanvas(w, h);
-    this.#camera.resize(this.#renderer.threeRenderer, h);
-    this.#renderer.resize(this.#scene, this.#camera.camera);
-
-    this.#resetControls();
   }
 
   #resetControls() {

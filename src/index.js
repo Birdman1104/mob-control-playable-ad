@@ -1,4 +1,5 @@
-import { Main } from "./main";
+import { ThreeApp } from "./main";
+import PixiUI from "./pixi-ui/PixiUI";
 
 const showErrorMessage = () => {
   const element = document.createElement("div");
@@ -17,8 +18,15 @@ const init = () => {
   if (!window.WebGLRenderingContext) {
     showErrorMessage();
   } else {
-    const container = document.getElementById("container");
-    new Main(container);
+    window.threeApp = new ThreeApp(document.getElementById("container"));
+
+    window.pixiUI = new PixiUI();
+    window.pixiUI.init();
+
+    window.addEventListener("resize", () => {
+      window.threeApp.resize();
+      window.pixiUI.appResize();
+    });
   }
 };
 
