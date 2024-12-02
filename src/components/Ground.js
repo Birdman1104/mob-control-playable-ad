@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { GroundConfig } from "../configs/ComponentsConfig";
+import { GroundConfig } from "../configs/componentsConfig";
 import { setTransforms } from "../utils";
 
 export default class Ground extends THREE.Group {

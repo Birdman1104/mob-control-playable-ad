@@ -12,10 +12,10 @@ export default class Tower extends THREE.Group {
   }
 
   shake() {
-    anime.remove(this.#tower.scene.rotation);
-    this.#tower.scene.rotation.set(0, 0, 0);
+    anime.remove(this.#tower.rotation);
+    this.#tower.rotation.set(0, 0, 0);
     anime({
-      targets: this.#tower.scene.rotation,
+      targets: this.#tower.rotation,
       x: [0, 0.1, -0.1, 0],
       duration: 500,
       easing: "easeInOutSine",
@@ -25,7 +25,7 @@ export default class Tower extends THREE.Group {
   #init() {
     this.#tower = MODELS["tower"];
 
-    this.add(this.#tower.scene);
+    this.add(this.#tower);
   }
 }
 

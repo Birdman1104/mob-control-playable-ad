@@ -1,10 +1,4 @@
-import * as THREE from "three";
-
-export default class Mob extends THREE.Group {
-  constructor() {
-    super();
-  }
-
+export default class Mob {
   attack() {
     //
   }

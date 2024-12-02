@@ -7,21 +7,18 @@ export default class Loader {
   #gltfLoader; // GLTFLoader
   #audioLoader; // THREE.AudioLoader
   #textureLoader; // THREE.TextureLoader
-  #cb; // Function
 
-  constructor(cb) {
-    this.#cb = cb;
-
+  constructor() {
     this.#gltfLoader = new GLTFLoader();
     this.#audioLoader = new THREE.AudioLoader();
     this.#textureLoader = new THREE.TextureLoader();
   }
 
-  load() {
+  load(cb) {
     this.#loadModels(() => {
       this.#loadSounds(() => {
         this.#loadTextures(() => {
-          callIfExists(this.#cb);
+          callIfExists(cb);
         });
       });
     });
@@ -34,7 +31,7 @@ export default class Loader {
     keys.forEach((model, i) => {
       this.#gltfLoader.load(models[model], (gltf) => {
         const modelName = model.split(".")[0];
-        MODELS[modelName] = gltf;
+        MODELS[modelName] = gltf.scene;
 
         if (i === keys.length - 1) {
           callIfExists(cb);

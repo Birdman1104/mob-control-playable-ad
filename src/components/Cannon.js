@@ -25,14 +25,14 @@ export default class Cannon extends THREE.Group {
 
   #initBase() {
     this.#cart = MODELS["cannon-cart"];
-    this.add(this.#cart.scene);
+    this.add(this.#cart);
   }
 
   #initTrunk() {
     this.#trunk = MODELS["cannon-trunk"];
-    this.#trunk.scene.position.set(0, 0.65, 0);
+    this.#trunk.position.set(0, 0.65, 0);
 
-    this.add(this.#trunk.scene);
+    this.add(this.#trunk);
 
     this.#playAnimation();
   }

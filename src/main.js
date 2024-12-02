@@ -2,10 +2,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import Cannon from "./components/Cannon";
 import Ground from "./components/Ground";
-import NormalMob from "./components/NormalMob";
 import Ocean from "./components/Ocean";
+import { Player } from "./components/Player";
 import Tower from "./components/Tower";
-import { CannonConfig, TowerConfig } from "./configs/ComponentsConfig";
+import { CannonConfig, TowerConfig } from "./configs/componentsConfig";
 import Camera from "./essentials/Camera";
 import Light from "./essentials/Light";
 import Loader from "./essentials/Loader";
@@ -30,6 +30,7 @@ export class ThreeApp {
   #mobs = [];
 
   #prevTime = 0;
+  #player;
 
   #touchStartX = 0;
   #isTouching = false;
@@ -43,10 +44,10 @@ export class ThreeApp {
 
     this.#renderer = new Renderer(this.#container);
     this.#camera = new Camera(this.#renderer.threeRenderer);
-    this.#loader = new Loader(() => this.#onAssetLoadingComplete());
+    this.#loader = new Loader();
 
     this.#container.appendChild(this.#renderer.threeRenderer.domElement);
-    this.#loader.load();
+    this.#loader.load(() => this.#onAssetLoadingComplete());
   }
 
   resize() {
@@ -67,7 +68,7 @@ export class ThreeApp {
 
     this.#canvas = document.getElementById("container");
     if (process.env.NODE_ENV !== "production") {
-      // this.#initOrbitControls();
+      this.#initOrbitControls();
     }
 
     this.#render();
@@ -79,6 +80,7 @@ export class ThreeApp {
     // this.#initOcean();
     this.#initTower();
     this.#initCannon();
+    this.#initPlayer();
   }
 
   #initPlane() {
@@ -107,19 +109,17 @@ export class ThreeApp {
     this.#cannon = new Cannon();
     setTransforms(this.#cannon, CannonConfig);
     this.#scene.add(this.#cannon);
+  }
 
-    const mob = new NormalMob();
-    mob.position.set(0, 0.5, 0);
-    mob.rotation.set(0, Math.PI / 2, 0);
-    this.#scene.add(mob);
-    this.#mobs.push(mob);
+  #initPlayer() {
+    this.#player = new Player(this.#scene);
   }
 
   #render(dt) {
     requestAnimationFrame(this.#render.bind(this));
     this.#cannon?.update(dt);
+    this.#player?.update(dt);
 
-    this.#mobs.forEach((mob) => mob.update(dt));
     this.#prevTime = dt;
     this.#renderer.render(this.#scene, this.#camera.camera);
   }
