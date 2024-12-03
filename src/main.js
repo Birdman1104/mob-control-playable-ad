@@ -200,7 +200,7 @@ export class ThreeApp {
 
   #getPlayerMobSpawnPosition() {
     const { x, y, z } = this.#cannon.position;
-    return new THREE.Vector3(x - 1, y, z);
+    return new THREE.Vector3(x - 1, y + 0.05, z);
   }
 }
 

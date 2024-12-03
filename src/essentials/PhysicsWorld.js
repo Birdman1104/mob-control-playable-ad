@@ -22,7 +22,7 @@ class PhysicsHandler {
 
     this.physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-    this.physicsWorld.setGravity(new Ammo.btVector3(1, 0, 0));
+    this.physicsWorld.setGravity(new Ammo.btVector3(0, 0, 0));
 
     this.rigidBodies = [];
     this.transformAux1 = new Ammo.btTransform();
@@ -81,6 +81,22 @@ class PhysicsHandler {
     }
   }
 
+  removePhysicsFromMob(mob) {
+    const body = mob.mesh.userData.physicsBody;
+    if (body) {
+      this.physicsWorld.removeRigidBody(body);
+
+      const index = this.rigidBodies.indexOf(mob);
+      if (index > -1) {
+        this.rigidBodies.splice(index, 1);
+      }
+
+      Ammo.destroy(body.getMotionState());
+      Ammo.destroy(body);
+      delete mob.mesh.userData.physicsBody;
+    }
+  }
+
   update(deltaTime) {
     if (!this.physicsWorld) return;
 
@@ -95,8 +111,10 @@ class PhysicsHandler {
         motionState.getWorldTransform(this.transformAux1);
         const position = this.transformAux1.getOrigin();
         const quaternion = this.transformAux1.getRotation();
+        const pos = { x: position.x(), y: position.y(), z: position.z() };
+        const quat = { x: quaternion.x(), y: quaternion.y(), z: quaternion.z(), w: quaternion.w() };
 
-        mob.updatePosition(position, quaternion);
+        mob.updatePosition(pos, quat);
       }
     }
 

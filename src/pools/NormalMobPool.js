@@ -1,7 +1,5 @@
-import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
-import { MODELS } from "../assets";
+import Mob from "../components/Mob";
 import { MobsConfig } from "../configs/mobsConfig";
-import PhysicsWorld from "../essentials/PhysicsWorld";
 
 const N = 20;
 
@@ -20,54 +18,29 @@ export default class NormalMobPool {
 
   getMob(position) {
     const mob = this.#mobs.find((mob) => !mob.isBorrowed) || this.#addMob();
-    mob.mesh.position.copy(position);
-    mob.isBorrowed = true;
-    mob.mesh.visible = true;
+    mob.updatePosition(position, { x: 0, y: 0, z: 0, w: 1 });
 
     if (!this.#mobs.includes(mob)) {
       this.#mobs.push(mob);
     }
 
-    PhysicsWorld.addPhysicsToMob(mob.mesh, 0, { friction: 0.7, restitution: 0.5 });
+    mob.activate(position);
 
     return mob;
   }
 
   returnMob(mob) {
-    mob.mesh.visible = false;
-    mob.isBorrowed = false;
+    mob.health = MobsConfig.NormalMob.health;
 
-    // PhysicsWorld.removeFromWorld(mob.body);
+    mob.deactivate();
   }
 
   #addMob() {
-    const mob = SkeletonUtils.clone(MODELS["mob"]);
-    // mob.traverse((node) => {
-    //   if (node.isMesh) {
-    //     node.material = node.material.clone();
-    //     node.frustumCulled = false;
-    //     node.visible = true;
-    //     node.material.opacity = 1.0;
-    //     node.material.side = THREE.DoubleSide; // Render both sides
-    //     node.material.needsUpdate = true;
-    //     node.renderOrder = 1;
-    //     node.layers.set(0);
-    //     node.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    //     if (node.skeleton) {
-    //       node.skeleton.pose(); // Reset to default pose
-    //     }
-    //   }
-    // });
-
-    mob.castShadow = true;
-    mob.receiveShadow = true;
-    mob.visible = false;
+    const { health, attackDelay, speed } = MobsConfig.NormalMob;
+    const mob = new Mob(this.#scene, "mob", health, attackDelay, speed);
     this.#scene.add(mob);
 
-    const { health, attackDelay, speed } = MobsConfig.NormalMob;
-    const obj = { mesh: mob, isBorrowed: false, health, attackDelay, speed };
-
-    return obj;
+    return mob;
 
     // mixer = new THREE.AnimationMixer(mesh.scene)
     // const action = mixer.clipAction(mesh.animations[0])

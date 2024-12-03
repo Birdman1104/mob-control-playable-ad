@@ -16,17 +16,8 @@ export class Player {
   }
 
   spawnMob(position) {
-    // const mob = this.#pool.getMob(position);
-    // // mob.body.position.copy(position);
-    // // mob.body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI / 2);
-    // this.#mobs.push(mob);
-  }
-
-  update() {
-    this.#mobs.forEach(({ mesh }) => {
-      // mesh.position.copy(body.position);
-      // mesh.quaternion.copy(body.quaternion);
-    });
+    const mob = this.#pool.getMob(position);
+    this.#mobs.push(mob);
   }
 }
 
