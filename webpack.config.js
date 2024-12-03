@@ -37,5 +37,12 @@ module.exports = {
     port: 9000,
     liveReload: true,
   },
+
+  resolve: {
+    fallback: {
+      path: false,
+      fs: false,
+    },
+  },
 };
 

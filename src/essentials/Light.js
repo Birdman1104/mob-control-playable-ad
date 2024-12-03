@@ -2,13 +2,12 @@ import * as THREE from "three";
 
 export default class Light {
   #ambientLight; // THREE.AmbientLight
+  #scene;
 
-  constructor() {
+  constructor(scene) {
+    this.#scene = scene;
     this.#ambientLight = this.#initAmbientLight();
-  }
-
-  addLights(scene) {
-    scene.add(this.#ambientLight);
+    this.#scene.add(this.#ambientLight);
   }
 
   #initAmbientLight() {

@@ -43,6 +43,7 @@ export default class Ocean extends THREE.Group {
     water.rotation.x = Math.PI * -0.5;
     this.add(water);
 
+    this.position.set(0, -1.5, 0);
     // // flow map helper
     // const helperGeometry = new THREE.PlaneGeometry(20, 20);
     // const helperMaterial = new THREE.MeshBasicMaterial({ map: flowMap });

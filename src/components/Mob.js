@@ -1,18 +1,68 @@
-export default class Mob {
-  attack() {
-    //
+import * as THREE from "three";
+import { SkeletonUtils } from "three/examples/jsm/Addons.js";
+import { MODELS } from "../assets";
+import PhysicsWorld from "../essentials/PhysicsWorld";
+
+export default class Mob extends THREE.Group {
+  #model;
+  #mesh;
+  #scene;
+  isBorrowed = false;
+
+  constructor(scene, type, health = 100, attackDelay = 1000, speed = 0.5) {
+    super();
+
+    this.#scene = scene;
+    this.type = type;
+    this.health = health;
+    this.attackDelay = attackDelay;
+    this.speed = speed;
+
+    this.#init();
   }
 
-  die() {
-    //
+  get mesh() {
+    return this.#mesh;
   }
 
-  move() {
-    //
+  get model() {
+    return this.#model;
   }
 
-  update() {
-    //
+  activate(position) {
+    this.#model.position.copy(position);
+    this.#model.visible = true;
+    this.#mesh.position.copy(position);
+    this.#mesh.visible = true;
+
+    PhysicsWorld.addPhysicsToMob(this, 1, { friction: 0.7, restitution: 0.5 });
+  }
+
+  updatePosition(position, quaternion) {
+    this.#model.position.set(position.x(), position.y(), position.z());
+    this.#model.quaternion.set(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w());
+
+    this.#mesh.position.set(position.x(), position.y(), position.z());
+    this.#mesh.quaternion.set(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w());
+  }
+
+  #init() {
+    this.#initModel();
+    this.#initMesh();
+  }
+
+  #initModel() {
+    this.#model = SkeletonUtils.clone(MODELS[this.type]);
+    this.#model.castShadow = true;
+    this.#model.receiveShadow = true;
+    this.#model.visible = false;
+    this.#scene.add(this.#model);
+  }
+
+  #initMesh() {
+    this.#mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
+    this.#mesh.visible = false;
+    this.#scene.add(this.#mesh);
   }
 }
 

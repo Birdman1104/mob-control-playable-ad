@@ -20,9 +20,15 @@
   },
   "dependencies": {
     "@armathai/pixi-grid": "^6.0.1",
+    "ammo.js": "^0.0.10",
     "animejs": "^3.2.2",
-    "cannon-es": "^0.20.0",
     "pixi.js": "^7.4.2",
     "three": "^0.170.0"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   }
 }
+

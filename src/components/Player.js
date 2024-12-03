@@ -11,17 +11,21 @@ export class Player {
     this.#mobs = [];
   }
 
+  shoot(position) {
+    this.spawnMob(position);
+  }
+
   spawnMob(position) {
-    const mob = this.#pool.getMob();
-    mob.mesh.position.copy(position);
-    mob.mesh.visible = true;
-    this.#mobs.push(mob);
+    // const mob = this.#pool.getMob(position);
+    // // mob.body.position.copy(position);
+    // // mob.body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI / 2);
+    // this.#mobs.push(mob);
   }
 
   update() {
-    this.#mobs.forEach(({ mesh, body }) => {
-      mesh.position.copy(body.position);
-      mesh.quaternion.copy(body.quaternion);
+    this.#mobs.forEach(({ mesh }) => {
+      // mesh.position.copy(body.position);
+      // mesh.quaternion.copy(body.quaternion);
     });
   }
 }

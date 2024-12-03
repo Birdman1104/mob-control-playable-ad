@@ -1,48 +1,111 @@
-import * as CANNON from "cannon-es";
-import { FD_SEC } from "../configs/constants";
-import { GRAVITY } from "../configs/physicsConfig";
+import Ammo from "ammo.js";
+import * as THREE from "three";
 
-export class Physics {
-  #world; // CANNON.World
-
+class PhysicsHandler {
   constructor() {
-    this.#world = this.#initWorld();
+    if (PhysicsHandler.instance) {
+      return PhysicsHandler.instance;
+    }
 
-    this.#world.addEventListener("collide", (event) => {
-      const { bodyA, bodyB } = event;
-      console.log(bodyA, bodyB);
-      // if (bodyA.name === 'playerMob' && bodyB.name === 'enemyMob') {
-      //   console.log('Collision detected!');
-      //   // Handle collision logic
-      // }
-    });
+    this.initAmmoPhysics();
+
+    PhysicsHandler.instance = this;
   }
 
-  get world() {
-    return this.#world;
+  async initAmmoPhysics() {
+    await Ammo;
+
+    const collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+    const dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+    const broadphase = new Ammo.btDbvtBroadphase();
+    const solver = new Ammo.btSequentialImpulseConstraintSolver();
+
+    this.physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+
+    this.physicsWorld.setGravity(new Ammo.btVector3(1, 0, 0));
+
+    this.rigidBodies = [];
+    this.transformAux1 = new Ammo.btTransform();
+  }
+
+  addPhysicsToMob(mob, mass, options = {}) {
+    const { friction = 0.5, restitution = 0.1 } = options;
+
+    mob.mesh.geometry.computeBoundingBox();
+    const boundingBox = mob.mesh.geometry.boundingBox;
+    const size = new THREE.Vector3();
+    boundingBox.getSize(size);
+
+    const halfExtents = new Ammo.btVector3(size.x / 2, size.y / 2, size.z / 2);
+    const collisionShape = new Ammo.btBoxShape(halfExtents);
+
+    const position = mob.mesh.position;
+    const transform = new Ammo.btTransform();
+    transform.setIdentity();
+    transform.setOrigin(new Ammo.btVector3(position.x, position.y, position.z));
+
+    const motionState = new Ammo.btDefaultMotionState(transform);
+
+    const localInertia = new Ammo.btVector3(0, 0, 0);
+    collisionShape.calculateLocalInertia(mass, localInertia);
+
+    const rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, collisionShape, localInertia);
+    const rigidBody = new Ammo.btRigidBody(rbInfo);
+
+    rigidBody.setFriction(friction);
+    rigidBody.setRestitution(restitution);
+
+    this.physicsWorld.addRigidBody(rigidBody);
+
+    mob.mesh.userData.physicsBody = rigidBody;
+
+    this.rigidBodies.push(mob);
+  }
+
+  checkCollisions(callback) {
+    const dispatcher = this.physicsWorld.getDispatcher();
+    const numManifolds = dispatcher.getNumManifolds();
+
+    for (let i = 0; i < numManifolds; i++) {
+      const contactManifold = dispatcher.getManifoldByIndexInternal(i);
+      const body0 = Ammo.castObject(contactManifold.getBody0(), Ammo.btRigidBody);
+      const body1 = Ammo.castObject(contactManifold.getBody1(), Ammo.btRigidBody);
+
+      const numContacts = contactManifold.getNumContacts();
+      for (let j = 0; j < numContacts; j++) {
+        const pt = contactManifold.getContactPoint(j);
+        if (pt.getDistance() < 0.0) {
+          callback(body0, body1);
+        }
+      }
+    }
   }
 
   update(deltaTime) {
-    this.#world.step(FD_SEC, deltaTime, 3);
-  }
+    if (!this.physicsWorld) return;
 
-  addToWorld(body) {
-    this.#world.addBody(body);
-  }
+    this.physicsWorld.stepSimulation(deltaTime, 10);
 
-  removeFromWorld(body) {
-    this.#world.removeBody(body);
-  }
+    for (let i = 0; i < this.rigidBodies.length; i++) {
+      const mob = this.rigidBodies[i];
+      const body = mob.mesh.userData.physicsBody;
 
-  #initWorld() {
-    const world = new CANNON.World();
-    world.broadphase = new CANNON.SAPBroadphase();
-    world.allowSleep = true;
-    world.gravity.set(0, GRAVITY, 0);
-    return world;
+      const motionState = body.getMotionState();
+      if (motionState) {
+        motionState.getWorldTransform(this.transformAux1);
+        const position = this.transformAux1.getOrigin();
+        const quaternion = this.transformAux1.getRotation();
+
+        mob.updatePosition(position, quaternion);
+      }
+    }
+
+    this.checkCollisions((body0, body1) => {
+      console.log("Collision detected between:", body0, body1);
+    });
   }
 }
 
-const PhysicsWorld = new Physics();
+const PhysicsWorld = new PhysicsHandler();
 export default PhysicsWorld;
 

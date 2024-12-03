@@ -1,6 +1,3 @@
-import * as CANNON from "cannon-es";
-import { Body, Sphere } from "cannon-es";
-import * as THREE from "three";
 import * as SkeletonUtils from "three/addons/utils/SkeletonUtils.js";
 import { MODELS } from "../assets";
 import { MobsConfig } from "../configs/mobsConfig";
@@ -21,18 +18,17 @@ export default class NormalMobPool {
     }
   }
 
-  getMob() {
+  getMob(position) {
     const mob = this.#mobs.find((mob) => !mob.isBorrowed) || this.#addMob();
-
+    mob.mesh.position.copy(position);
     mob.isBorrowed = true;
     mob.mesh.visible = true;
-    PhysicsWorld.addToWorld(mob.body);
 
     if (!this.#mobs.includes(mob)) {
       this.#mobs.push(mob);
     }
 
-    PhysicsWorld.addToWorld(mob.body);
+    PhysicsWorld.addPhysicsToMob(mob.mesh, 0, { friction: 0.7, restitution: 0.5 });
 
     return mob;
   }
@@ -41,7 +37,7 @@ export default class NormalMobPool {
     mob.mesh.visible = false;
     mob.isBorrowed = false;
 
-    PhysicsWorld.removeFromWorld(mob.body);
+    // PhysicsWorld.removeFromWorld(mob.body);
   }
 
   #addMob() {
@@ -68,18 +64,8 @@ export default class NormalMobPool {
     mob.visible = false;
     this.#scene.add(mob);
 
-    const box = new THREE.BoxHelper(mob, 0xff0000);
-    this.#scene.add(box);
-
-    // Physics
-    const body = new Body({
-      mass: 1,
-      shape: new Sphere(0.5),
-      position: new CANNON.Vec3(0, 0, 0),
-    });
-
     const { health, attackDelay, speed } = MobsConfig.NormalMob;
-    const obj = { mesh: mob, body, isBorrowed: false, health, attackDelay, speed };
+    const obj = { mesh: mob, isBorrowed: false, health, attackDelay, speed };
 
     return obj;
 
