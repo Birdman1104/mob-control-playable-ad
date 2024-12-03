@@ -1,6 +1,8 @@
+import Ammo from "ammo.js";
 import * as THREE from "three";
 import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 import { MODELS } from "../assets";
+import { TowerConfig } from "../configs/componentsConfig";
 import PhysicsWorld from "../essentials/PhysicsWorld";
 
 export default class Mob extends THREE.Group {
@@ -17,7 +19,8 @@ export default class Mob extends THREE.Group {
     this.health = health;
     this.attackDelay = attackDelay;
     this.speed = speed;
-
+    this.direction = new THREE.Vector3(100, 100, 0);
+    this.target1 = new THREE.Vector3(-10, 0, 0);
     this.#init();
   }
 
@@ -29,14 +32,27 @@ export default class Mob extends THREE.Group {
     return this.#model;
   }
 
-  activate(position) {
+  getTargetDestination() {
+    if (this.#mesh.position.x < -8) {
+      const { x, y, z } = TowerConfig.position;
+      return new THREE.Vector3(x, y, z);
+    } else {
+      return new THREE.Vector3(-8.1, 0, 0);
+    }
+  }
+
+  activate({ x, y, z }) {
     this.isBorrowed = true;
-    this.#model.position.copy(position);
+    this.#model.position.set(x, y, z);
     this.#model.visible = true;
-    this.#mesh.position.copy(position);
+    this.#mesh.position.set(x, y, z);
     this.#mesh.visible = true;
 
     PhysicsWorld.addPhysicsToMob(this, 1, { friction: 0.7, restitution: 0.5 });
+
+    this.#mesh.userData?.physicsBody?.setLinearVelocity(
+      new Ammo.btVector3(Math.sign(this.target1.x) * this.speed, 0, 0)
+    );
   }
 
   deactivate() {
@@ -48,12 +64,9 @@ export default class Mob extends THREE.Group {
     PhysicsWorld.removePhysicsFromMob(this);
   }
 
-  updatePosition(position, quaternion) {
+  updatePosition(position) {
     this.#model.position.set(position.x, position.y, position.z);
-    this.#model.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-
     this.#mesh.position.set(position.x, position.y + 0.5, position.z);
-    this.#mesh.quaternion.set(quaternion.x, quaternion.y + 0.5, quaternion.z, quaternion.w);
   }
 
   #init() {

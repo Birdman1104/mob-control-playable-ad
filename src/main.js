@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import Cannon from "./components/Cannon";
 import Ground from "./components/Ground";
-import Mob from "./components/Mob";
 import { Player } from "./components/Player";
 import Tower from "./components/Tower";
 import { CannonConfig, TowerConfig } from "./configs/componentsConfig";
@@ -92,15 +91,6 @@ export class ThreeApp {
     setTransforms(this.#cannon, CannonConfig);
 
     this.#player = new Player(this.#scene);
-
-    // const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0x00ff00 }));
-    // mesh.visible = false;
-    // this.#scene.add(mesh);
-    // PhysicsWorld.addPhysicsToModel(mesh, 1);
-
-    const mob = new Mob(this.#scene, "mob");
-    mob.activate(new THREE.Vector3(0, 0, 0));
-    // this.#scene.add(mob);
   }
 
   #update(dt) {
@@ -108,7 +98,6 @@ export class ThreeApp {
     const deltaTime = this.#clock.getDelta();
     PhysicsWorld.update(deltaTime);
     this.#cannon?.update(dt);
-    this.#player?.update(dt);
 
     const dif = dt - this.#prevTime;
 

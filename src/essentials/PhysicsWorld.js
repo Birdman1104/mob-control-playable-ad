@@ -114,12 +114,12 @@ class PhysicsHandler {
         const pos = { x: position.x(), y: position.y(), z: position.z() };
         const quat = { x: quaternion.x(), y: quaternion.y(), z: quaternion.z(), w: quaternion.w() };
 
-        mob.updatePosition(pos, quat);
+        mob.updatePosition(pos);
       }
     }
 
     this.checkCollisions((body0, body1) => {
-      console.log("Collision detected between:", body0, body1);
+      // console.log("Collision detected between:", body0, body1);
     });
   }
 }
